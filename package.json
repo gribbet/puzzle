@@ -1,0 +1,20 @@
+{
+  "name": "puzzle",
+  "version": "1.0.0",
+  "devDependencies": {
+    "@types/react": "^16.7.18",
+    "@types/react-dom": "^16.0.11",
+    "parcel": "^1.11.0",
+    "typescript": "^3.2.2"
+  },
+  "dependencies": {
+    "mobx": "^5.8.0",
+    "mobx-react": "^5.4.3",
+    "react": "^16.7.0",
+    "react-dom": "^16.7.0",
+    "typestyle": "^2.0.1"
+  },
+  "scripts": {
+    "start": "parcel index.html"
+  }
+}
