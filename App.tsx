@@ -3,7 +3,8 @@ import * as React from "react";
 import { Component } from "react";
 
 const app = style({
-  color: "red"
+  display: "flex",
+  flex: 1
 });
 
 export class App extends Component {
