@@ -1,6 +1,7 @@
 import { style } from "typestyle";
 import * as React from "react";
 import { Component } from "react";
+import { Puzzle } from "./Puzzle";
 
 const app = style({
   display: "flex",
@@ -9,6 +10,10 @@ const app = style({
 
 export class App extends Component {
   public render() {
-    return <div className={app}>Test</div>;
+    return (
+      <div className={app}>
+        <Puzzle />
+      </div>
+    );
   }
 }
