@@ -15,8 +15,8 @@ const puzzle = style({
 const range = (start: number, end: number) =>
   end <= start ? [] : new Array(end - start).fill(0).map((_, i) => i + start);
 
-const rows = 100;
-const columns = 200;
+const rows = 10;
+const columns = 10;
 const pieceHeight = 1 / rows;
 const pieceWidth = 1 / columns;
 const pieces: Polygon[] = range(0, rows)
