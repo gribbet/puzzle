@@ -2,39 +2,34 @@ import * as React from "react";
 import { PureComponent, MouseEvent, Component } from "react";
 import { style } from "typestyle";
 
-import { Polygon } from "./Polygon";
-import { Vertex } from "./Vertex";
 import { observable } from "mobx";
 import { observer } from "mobx-react";
+import { Shape, Point, IPiece } from "./model";
 
 export interface IPieceProps {
   index: number;
-  shape: Polygon;
+  piece: IPiece;
   imageUrl: string;
+  onDragStart: () => void;
 }
 
 @observer
 export class Piece extends Component<IPieceProps> {
-  private dragging: boolean = false;
-  private gRef?: SVGGElement;
-  @observable
-  private position: Vertex = [Math.random() - 0.5, Math.random() - 0.5];
-  @observable
-  private rotation: number = Math.random() * 360;
-
   public render() {
-    const { index, shape, imageUrl } = this.props;
-    const [x, y] = this.position;
+    const { index, piece, imageUrl } = this.props;
+    const { offset, rotation, shape } = piece;
+    const [x, y] = offset;
 
     return (
       <g
-        ref={_ => (this.gRef = _ || undefined)}
+        transform={`rotate(${rotation}) translate(${x - 0.5} ${y - 0.5})`}
         onMouseDown={this.onMouseDown}
-        onMouseMove={this.onMouseMove}
-        transform={`rotate(${this.rotation}) translate(${x - 0.5} ${y - 0.5})`}
+        id={`piece-${index}`}
       >
-        <clipPath id={`piece-${index}`}>
-          <polygon points={shape.map(([x, y]) => `${x} ${y}`).join(", ")} />
+        <clipPath id={`piece-clip-${index}`}>
+          <polygon
+            points={piece.shape.map(([x, y]) => `${x} ${y}`).join(", ")}
+          />
         </clipPath>
 
         <polygon
@@ -50,7 +45,7 @@ export class Piece extends Component<IPieceProps> {
           height={1}
           className={style({
             cursor: "pointer",
-            clipPath: `url(#piece-${index})`
+            clipPath: `url(#piece-clip-${index})`
           })}
         />
 
@@ -65,38 +60,5 @@ export class Piece extends Component<IPieceProps> {
     );
   }
 
-  private onMouseDown = () => (this.dragging = true);
-
-  private onMouseMove = (event: MouseEvent) => {
-    if (!event.buttons) {
-      this.dragging = false;
-    }
-
-    if (!this.dragging) {
-      return;
-    }
-
-    const [ax, ay] = this.toWorld([event.clientX, event.clientY]);
-    const [bx, by] = this.toWorld([
-      event.clientX + event.movementX,
-      event.clientY + event.movementY
-    ]);
-
-    const [x, y] = this.position;
-    this.position = [x + bx - ax, y + by - ay];
-  };
-
-  private toWorld(vertex: Vertex): Vertex {
-    return this.transform(vertex, this.gRef!.getScreenCTM()!.inverse());
-  }
-
-  private toScreen(vertex: Vertex): Vertex {
-    return this.transform(vertex, this.gRef!.getScreenCTM()!);
-  }
-
-  private transform(vertex: Vertex, matrix?: DOMMatrix): Vertex {
-    const [x, y] = vertex;
-    const point = new DOMPoint(x, y).matrixTransform(matrix);
-    return [point.x, point.y];
-  }
+  private onMouseDown = () => this.props.onDragStart();
 }
