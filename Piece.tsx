@@ -18,9 +18,9 @@ export class Piece extends Component<IPieceProps> {
   private dragging: boolean = false;
   private gRef?: SVGGElement;
   @observable
-  private position: Vertex = [0, 0]; //[Math.random() - 0.5, Math.random() - 0.5];
+  private position: Vertex = [Math.random() - 0.5, Math.random() - 0.5];
   @observable
-  private rotation: number = 0; //ath.random() * 2 * Math.PI;
+  private rotation: number = Math.random() * 360;
 
   public render() {
     const { index, shape, imageUrl } = this.props;
@@ -31,8 +31,7 @@ export class Piece extends Component<IPieceProps> {
         ref={_ => (this.gRef = _ || undefined)}
         onMouseDown={this.onMouseDown}
         onMouseMove={this.onMouseMove}
-        transform={`rotate(${(this.rotation * 180) /
-          Math.PI} 0.5 0.5) translate(${x} ${y})`}
+        transform={`rotate(${this.rotation}) translate(${x - 0.5} ${y - 0.5})`}
       >
         <clipPath id={`piece-${index}`}>
           <polygon points={shape.map(([x, y]) => `${x} ${y}`).join(", ")} />

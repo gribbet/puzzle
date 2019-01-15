@@ -6,6 +6,7 @@ import { observer } from "mobx-react";
 import { Polygon } from "./Polygon";
 import { Piece } from "./Piece";
 import { Pieces } from "./Pieces";
+import { Vertex } from "./Vertex";
 
 const puzzle = style({
   width: "100%",
@@ -32,17 +33,21 @@ const pieces: Polygon[] = range(0, rows)
 
 @observer
 export class Puzzle extends Component {
+  private gRef?: SVGGElement;
   @observable
   private scale = 1;
   @observable
-  private x = 0;
-  @observable
-  private y = 0;
+  private position: Vertex = [0, 0];
 
   public render() {
+    const [x, y] = this.position;
+
     return (
-      <svg className={puzzle} viewBox="0 0 1 1" onWheel={this.onWheel}>
-        <g transform={`translate(${this.x} ${this.y}) scale(${this.scale})`}>
+      <svg className={puzzle} viewBox="-0.5 -0.5 1 1" onWheel={this.onWheel}>
+        <g
+          ref={_ => (this.gRef = _ || undefined)}
+          transform={`scale(${this.scale}) translate(${x} ${y})`}
+        >
           <Pieces pieces={pieces} />
         </g>
       </svg>
@@ -53,11 +58,42 @@ export class Puzzle extends Component {
     event.preventDefault();
     event.stopPropagation();
     if (event.ctrlKey) {
-      this.scale -= this.scale * event.deltaY * 0.01;
+      const ds = this.scale * event.deltaY * 0.01;
+
+      const [ax, ay] = this.toWorld([event.clientX, event.clientY]);
+
+      const [bx, by] = [
+        (ax / this.scale) * (this.scale - ds),
+        (ay / this.scale) * (this.scale - ds)
+      ];
+
+      const [x, y] = this.position;
+      this.position = [x + bx - ax, y + by - ay];
+
+      this.scale -= ds;
     } else {
-      const factor = 0.001;
-      this.x += event.deltaX * factor;
-      this.y += event.deltaY * factor;
+      const [ax, ay] = this.toWorld([event.clientX, event.clientY]);
+      const [bx, by] = this.toWorld([
+        event.clientX + event.deltaX,
+        event.clientY + event.deltaY
+      ]);
+
+      const [x, y] = this.position;
+      this.position = [x + bx - ax, y + by - ay];
     }
   };
+
+  private toWorld(vertex: Vertex): Vertex {
+    return this.transform(vertex, this.gRef!.getScreenCTM()!.inverse());
+  }
+
+  private toScreen(vertex: Vertex): Vertex {
+    return this.transform(vertex, this.gRef!.getScreenCTM()!);
+  }
+
+  private transform(vertex: Vertex, matrix?: DOMMatrix): Vertex {
+    const [x, y] = vertex;
+    const point = new DOMPoint(x, y).matrixTransform(matrix);
+    return [point.x, point.y];
+  }
 }

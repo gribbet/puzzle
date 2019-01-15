@@ -19,7 +19,7 @@ export class Pieces extends PureComponent<IPiecesProps> {
             key={i}
             index={i}
             shape={piece}
-            imageUrl="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Mount_Rainier_7437.JPG/1200px-Mount_Rainier_7437.JPG"
+            imageUrl="https://i.redd.it/4st67jvypha21.jpg"
           />
         ))}
       </g>
