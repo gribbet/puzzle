@@ -5,6 +5,7 @@ import { style } from "typestyle";
 import { observable } from "mobx";
 import { observer } from "mobx-react";
 import { Shape, Point, IPiece } from "./model";
+import { centroid } from "./math";
 
 export interface IPieceProps {
   index: number;
@@ -19,10 +20,11 @@ export class Piece extends Component<IPieceProps> {
     const { index, piece, imageUrl } = this.props;
     const { offset, rotation, shape } = piece;
     const [x, y] = offset;
+    const [cx, cy] = centroid(shape);
 
     return (
       <g
-        transform={`rotate(${rotation}) translate(${x - 0.5} ${y - 0.5})`}
+        transform={`rotate(${rotation} ${cx} ${cy}) translate(${x} ${y})`}
         onMouseDown={this.onMouseDown}
         id={`piece-${index}`}
       >

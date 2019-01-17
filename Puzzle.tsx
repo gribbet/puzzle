@@ -5,6 +5,7 @@ import { observable, entries } from "mobx";
 import { observer } from "mobx-react";
 import { Piece } from "./Piece";
 import { Point, IPiece } from "./model";
+import { centroid, angle, rotate } from "./math";
 
 const puzzle = style({
   width: "100%",
@@ -54,7 +55,7 @@ export class Puzzle extends Component {
       <svg className={puzzle} viewBox="-0.5 -0.5 1 1" onWheel={this.onWheel}>
         <g
           ref={_ => (this.gRef = _ || undefined)}
-          transform={`scale(${this.scale}) translate(${x} ${y})`}
+          transform={`scale(${this.scale}) translate(${x - 0.5} ${y - 0.5})`}
           onMouseMove={this.onMouseMove}
         >
           {this.pieces.map((piece, i) => (
@@ -112,15 +113,25 @@ export class Puzzle extends Component {
       return;
     }
 
-    const [ax, ay] = this.toWorld([event.clientX, event.clientY]);
-    const [bx, by] = this.toWorld([
-      event.clientX + event.movementX,
-      event.clientY + event.movementY
-    ]);
-
     const piece = this.pieces[this.dragging];
-    const [x, y] = piece.offset;
+    const { shape, offset } = piece;
+
+    const [ax, ay] = this.toWorld([
+      event.clientX - event.movementX,
+      event.clientY - event.movementY
+    ]);
+    const [bx, by] = this.toWorld([event.clientX, event.clientY]);
+    const [cx, cy] = centroid(shape);
+
+    const [x, y] = offset;
+
+    const [vx, vy] = [cx + x, cy + y];
+
+    const dr = angle([vx, vy], [ax, ay], [bx, by]);
+    const [rx, ry] = rotate([vx, vy], dr);
+
     piece.offset = [x + bx - ax, y + by - ay];
+    piece.rotation += dr;
   };
 
   private toWorld(Point: Point): Point {
