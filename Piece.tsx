@@ -1,10 +1,9 @@
 import { observer } from "mobx-react";
 import * as React from "react";
 import { Component } from "react";
-import { style } from "typestyle";
 
 import { Draggable } from "./Draggable";
-import { centroid, radius, add } from "./math";
+import { centroid, radius } from "./math";
 import { IPiece, Point } from "./model";
 
 export interface IPieceProps {
@@ -17,7 +16,7 @@ export interface IPieceProps {
 export class Piece extends Component<IPieceProps> {
   public render() {
     const { piece, imageUrl, onMove } = this.props;
-    const { number, position, rotation, shape } = piece;
+    const { position, rotation, shape } = piece;
     const [cx, cy] = centroid(shape);
 
     return (
