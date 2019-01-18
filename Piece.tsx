@@ -14,7 +14,10 @@ import {
   perpendicular,
   normalize,
   length,
-  radius
+  radius,
+  toDegrees,
+  add,
+  scale
 } from "./math";
 import { CaughtException } from "mobx/lib/internal";
 
@@ -117,18 +120,27 @@ export class Piece extends Component<IPieceProps> {
       return;
     }
 
-    const { shape } = this.props.piece;
+    const { piece } = this.props;
+    const { shape, offset } = piece;
 
     const { clientX, clientY, movementX, movementY } = event;
 
     const a = this.toLocal([clientX - movementX, clientY - movementY]);
     const b = this.toLocal([clientX, clientY]);
 
-    const dr =
-      ((180.0 / Math.PI) * dot(subtract(b, a), perpendicular(this.dragging))) /
-      radius(shape) /
-      radius(shape);
+    const dr = toDegrees(
+      dot(
+        subtract(b, a),
+        scale(perpendicular(this.dragging), 1 / radius(shape))
+      ) / radius(shape)
+    );
 
-    this.props.piece.rotation += dr;
+    piece.rotation += dr;
+
+    const matrix = new DOMMatrix().multiply(
+      this.gRef!.getScreenCTM()!.rotate(0, 0, dr)
+    );
+    const c = this.transform([clientX, clientY], matrix.inverse());
+    piece.offset = add(offset, subtract(c, this.dragging));
   };
 }

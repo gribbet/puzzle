@@ -82,3 +82,7 @@ export function length([x, y]: Point): number {
 export function scale([x, y]: Point, a: number): Point {
   return [a * x, a * y];
 }
+
+export function toDegrees(x: number): number {
+  return (x / Math.PI) * 180;
+}
