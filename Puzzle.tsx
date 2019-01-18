@@ -19,7 +19,7 @@ export class Puzzle extends Component {
   private position: Point = [0, 0];
 
   public async componentWillMount() {
-    this.puzzle = await generate("https://i.redd.it/4st67jvypha21.jpg", 200);
+    this.puzzle = await generate("https://i.redd.it/4st67jvypha21.jpg", 100);
   }
 
   public render() {

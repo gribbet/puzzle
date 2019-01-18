@@ -25,12 +25,11 @@ export class Draggable extends Component<IDraggableProps> {
 
   public render() {
     const { position, rotation, children } = this.props;
-    const [x, y] = position;
 
     return (
       <g
         ref={_ => (this.gRef = _ || undefined)}
-        transform={`rotate(${rotation}) translate(${x} ${y})`}
+        transform={this.transform(position, rotation)}
         onMouseDown={this.onMouseDown}
       >
         {children}
@@ -39,13 +38,16 @@ export class Draggable extends Component<IDraggableProps> {
   }
 
   private toLocal(point: Point): Point {
-    return this.transform(point, this.gRef!.getScreenCTM()!.inverse());
+    const [x0, y0] = point;
+    const { x, y } = new DOMPoint(x0, y0).matrixTransform(
+      this.gRef!.getScreenCTM()!.inverse()
+    );
+    return [x, y];
   }
 
-  private transform(point: Point, matrix?: DOMMatrix): Point {
-    const [x0, y0] = point;
-    const { x, y } = new DOMPoint(x0, y0).matrixTransform(matrix);
-    return [x, y];
+  private transform(position: Point, rotation: number) {
+    const [x, y] = position;
+    return `rotate(${rotation}) translate(${x} ${y})`;
   }
 
   private onMouseDown = ({ clientX, clientY }: React.MouseEvent) => {
@@ -57,7 +59,7 @@ export class Draggable extends Component<IDraggableProps> {
       this.dragging = undefined;
     }
 
-    if (this.dragging === undefined) {
+    if (this.dragging === undefined || !this.gRef) {
       return;
     }
 
@@ -69,9 +71,13 @@ export class Draggable extends Component<IDraggableProps> {
 
     const x0 = this.toLocal(subtract(client, movement));
     const x = this.toLocal(client);
-
     const dr = toDegrees(
       dot(subtract(x, x0), perpendicular(this.dragging)) / radius / radius
+    );
+
+    this.gRef.setAttribute(
+      "transform",
+      this.transform(position, rotation + dr)
     );
 
     onMove({
