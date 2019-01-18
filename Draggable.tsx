@@ -63,19 +63,19 @@ export class Draggable extends Component<IDraggableProps> {
     }
 
     const { position, rotation, radius, onRotate, onMove } = this.props;
-
     const { clientX, clientY, movementX, movementY } = event;
 
-    const x0 = this.toLocal([clientX - movementX, clientY - movementY]);
-    const x = this.toLocal([clientX, clientY]);
+    const client: Point = [clientX, clientY];
+    const movement: Point = [movementX, movementY];
+
+    const x0 = this.toLocal(subtract(client, movement));
+    const x = this.toLocal(client);
 
     const dr = toDegrees(
       dot(subtract(x, x0), perpendicular(this.dragging)) / radius / radius
     );
 
     onRotate(rotation + dr);
-    onMove(
-      add(position, subtract(this.toLocal([clientX, clientY]), this.dragging))
-    );
+    onMove(add(position, subtract(this.toLocal(client), this.dragging)));
   };
 }
