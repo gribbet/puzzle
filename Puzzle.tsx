@@ -5,7 +5,15 @@ import { observable, entries } from "mobx";
 import { observer } from "mobx-react";
 import { Piece } from "./Piece";
 import { Point, IPiece } from "./model";
-import { centroid, angle, rotate } from "./math";
+import {
+  centroid,
+  angle,
+  rotate,
+  dot,
+  perpendicular,
+  subtract,
+  add
+} from "./math";
 
 const puzzle = style({
   width: "100%",
@@ -45,11 +53,24 @@ export class Puzzle extends Component {
   private position: Point = [0, 0];
   @observable
   private dragging?: number;
+  @observable
+  private dragStart: Point = [0, 0];
 
   public render() {
     const [x, y] = this.position;
 
-    const onDragStart = (index: number) => () => (this.dragging = index);
+    const onMouseDown = (i: number) => ({ clientX, clientY }: MouseEvent) => {
+      this.dragging = i;
+      const { shape, offset, rotation } = this.pieces[i];
+
+      this.dragStart = rotate(
+        subtract(
+          subtract(this.toWorld([clientX, clientY]), centroid(shape)),
+          offset
+        ),
+        -rotation
+      );
+    };
 
     return (
       <svg className={puzzle} viewBox="-0.5 -0.5 1 1" onWheel={this.onWheel}>
@@ -64,7 +85,6 @@ export class Puzzle extends Component {
               index={i}
               piece={piece}
               imageUrl="https://i.redd.it/4st67jvypha21.jpg"
-              onDragStart={onDragStart(i)}
             />
           ))}
           {this.dragging && (
@@ -104,47 +124,17 @@ export class Puzzle extends Component {
     }
   };
 
-  private onMouseMove = (event: MouseEvent) => {
-    if (!event.buttons) {
-      this.dragging = undefined;
-    }
-
-    if (this.dragging === undefined) {
-      return;
-    }
-
-    const piece = this.pieces[this.dragging];
-    const { shape, offset } = piece;
-
-    const [ax, ay] = this.toWorld([
-      event.clientX - event.movementX,
-      event.clientY - event.movementY
-    ]);
-    const [bx, by] = this.toWorld([event.clientX, event.clientY]);
-    const [cx, cy] = centroid(shape);
-
-    const [x, y] = offset;
-
-    const [vx, vy] = [cx + x, cy + y];
-
-    const dr = angle([vx, vy], [ax, ay], [bx, by]);
-    const [rx, ry] = rotate([vx, vy], dr);
-
-    piece.offset = [x + bx - ax, y + by - ay];
-    piece.rotation += dr;
-  };
-
-  private toWorld(Point: Point): Point {
-    return this.transform(Point, this.gRef!.getScreenCTM()!.inverse());
+  private toWorld(point: Point): Point {
+    return this.transform(point, this.gRef!.getScreenCTM()!.inverse());
   }
 
-  private toScreen(Point: Point): Point {
-    return this.transform(Point, this.gRef!.getScreenCTM()!);
+  private toScreen(point: Point): Point {
+    return this.transform(point, this.gRef!.getScreenCTM()!);
   }
 
-  private transform(Point: Point, matrix?: DOMMatrix): Point {
-    const [x, y] = Point;
-    const point = new DOMPoint(x, y).matrixTransform(matrix);
-    return [point.x, point.y];
+  private transform(point: Point, matrix?: DOMMatrix): Point {
+    const [x0, y0] = point;
+    const { x, y } = new DOMPoint(x0, y0).matrixTransform(matrix);
+    return [x, y];
   }
 }
