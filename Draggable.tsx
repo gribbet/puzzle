@@ -1,7 +1,7 @@
 import { Component } from "react";
 import * as React from "react";
 
-import { dot, perpendicular, subtract, toDegrees, add } from "./math";
+import { add, dot, length, perpendicular, subtract, toDegrees } from "./math";
 import { Point } from "./model";
 
 export interface IDraggableProps {
@@ -72,7 +72,11 @@ export class Draggable extends Component<IDraggableProps> {
     const x0 = this.toLocal(subtract(client, movement));
     const x = this.toLocal(client);
     const dr = toDegrees(
-      dot(subtract(x, x0), perpendicular(this.dragging)) / radius / radius
+      (dot(subtract(x, x0), perpendicular(this.dragging)) /
+        radius /
+        radius /
+        radius) *
+        length(this.dragging)
     );
 
     this.gRef.setAttribute(
