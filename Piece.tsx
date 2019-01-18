@@ -12,7 +12,6 @@ export interface IPieceProps {
   onMove: (_: { position: Point; rotation: number }) => void;
 }
 
-@observer
 export class Piece extends Component<IPieceProps> {
   public render() {
     const { piece, imageUrl, onMove } = this.props;
@@ -39,7 +38,6 @@ export class Piece extends Component<IPieceProps> {
                 .join(", ")})`}
               cursor="pointer"
             />
-
             <polygon
               points={shape.map(([x, y]) => `${x} ${y}`).join(", ")}
               stroke="#ffffff40"
