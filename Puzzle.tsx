@@ -30,7 +30,7 @@ const pieceWidth = 1 / columns;
 const pieces: IPiece[] = range(0, rows)
   .map(i =>
     range(0, columns).map<IPiece>(j => ({
-      offset: [0, 0],
+      position: [0, 0],
       rotation: 0,
       shape: [
         [i * pieceWidth, j * pieceHeight],
@@ -61,11 +61,11 @@ export class Puzzle extends Component {
 
     const onMouseDown = (i: number) => ({ clientX, clientY }: MouseEvent) => {
       this.dragging = i;
-      const { shape, offset, rotation } = this.pieces[i];
+      const { shape, position: offset, rotation } = this.pieces[i];
 
       this.dragStart = rotate(
         subtract(
-          subtract(this.toWorld([clientX, clientY]), centroid(shape)),
+          subtract(this.toLocal([clientX, clientY]), centroid(shape)),
           offset
         ),
         -rotation
@@ -77,7 +77,6 @@ export class Puzzle extends Component {
         <g
           ref={_ => (this.gRef = _ || undefined)}
           transform={`scale(${this.scale}) translate(${x - 0.5} ${y - 0.5})`}
-          onMouseMove={this.onMouseMove}
         >
           {this.pieces.map((piece, i) => (
             <Piece
@@ -101,7 +100,7 @@ export class Puzzle extends Component {
     if (event.ctrlKey) {
       const ds = this.scale * event.deltaY * 0.01;
 
-      const [ax, ay] = this.toWorld([event.clientX, event.clientY]);
+      const [ax, ay] = this.toLocal([event.clientX, event.clientY]);
 
       const [bx, by] = [
         (ax / this.scale) * (this.scale - ds),
@@ -113,8 +112,8 @@ export class Puzzle extends Component {
 
       this.scale -= ds;
     } else {
-      const [ax, ay] = this.toWorld([event.clientX, event.clientY]);
-      const [bx, by] = this.toWorld([
+      const [ax, ay] = this.toLocal([event.clientX, event.clientY]);
+      const [bx, by] = this.toLocal([
         event.clientX + event.deltaX,
         event.clientY + event.deltaY
       ]);
@@ -124,12 +123,8 @@ export class Puzzle extends Component {
     }
   };
 
-  private toWorld(point: Point): Point {
+  private toLocal(point: Point): Point {
     return this.transform(point, this.gRef!.getScreenCTM()!.inverse());
-  }
-
-  private toScreen(point: Point): Point {
-    return this.transform(point, this.gRef!.getScreenCTM()!);
   }
 
   private transform(point: Point, matrix?: DOMMatrix): Point {
