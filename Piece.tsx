@@ -29,11 +29,6 @@ export class Piece extends Component<IPieceProps> {
           onMove={onMove}
         >
           <g transform={`translate(${-cx} ${-cy})`}>
-            <polygon
-              points={piece.shape.map(([x, y]) => `${x} ${y}`).join(", ")}
-              fill="black"
-            />
-
             <image
               xlinkHref={imageUrl}
               x={0}

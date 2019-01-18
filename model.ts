@@ -8,3 +8,8 @@ export interface IPiece {
   rotation: number;
   shape: Shape;
 }
+
+export interface IPuzzle {
+  url: string;
+  pieces: IPiece[];
+}
