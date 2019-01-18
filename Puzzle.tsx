@@ -30,6 +30,7 @@ const pieceWidth = 1 / columns;
 const pieces: IPiece[] = range(0, rows)
   .map(i =>
     range(0, columns).map<IPiece>(j => ({
+      number: i * columns + j,
       position: [0, 0],
       rotation: 0,
       shape: [
@@ -80,15 +81,16 @@ export class Puzzle extends Component {
         >
           {this.pieces.map((piece, i) => (
             <Piece
-              key={i}
-              index={i}
+              key={piece.number}
               piece={piece}
               imageUrl="https://i.redd.it/4st67jvypha21.jpg"
+              onMove={({ position, rotation }) => {
+                piece.position = position;
+                piece.rotation = rotation;
+                this.pieces = [...this.pieces.filter(_ => _ !== piece), piece];
+              }}
             />
           ))}
-          {this.dragging && (
-            <use href={`#piece-${this.dragging}`} pointerEvents="none" />
-          )}
         </g>
       </svg>
     );

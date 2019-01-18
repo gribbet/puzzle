@@ -8,8 +8,7 @@ export interface IDraggableProps {
   position: Point;
   rotation: number;
   radius: number;
-  onMove: (translation: Point) => void;
-  onRotate: (rotation: number) => void;
+  onMove: (_: { position: Point; rotation: number }) => void;
 }
 
 export class Draggable extends Component<IDraggableProps> {
@@ -62,7 +61,7 @@ export class Draggable extends Component<IDraggableProps> {
       return;
     }
 
-    const { position, rotation, radius, onRotate, onMove } = this.props;
+    const { position, rotation, radius, onMove } = this.props;
     const { clientX, clientY, movementX, movementY } = event;
 
     const client: Point = [clientX, clientY];
@@ -75,7 +74,9 @@ export class Draggable extends Component<IDraggableProps> {
       dot(subtract(x, x0), perpendicular(this.dragging)) / radius / radius
     );
 
-    onRotate(rotation + dr);
-    onMove(add(position, subtract(this.toLocal(client), this.dragging)));
+    onMove({
+      position: add(position, subtract(this.toLocal(client), this.dragging)),
+      rotation: rotation + dr
+    });
   };
 }

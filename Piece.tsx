@@ -5,29 +5,28 @@ import { style } from "typestyle";
 
 import { Draggable } from "./Draggable";
 import { centroid, radius, add } from "./math";
-import { IPiece } from "./model";
+import { IPiece, Point } from "./model";
 
 export interface IPieceProps {
-  index: number;
   piece: IPiece;
   imageUrl: string;
+  onMove: (_: { position: Point; rotation: number }) => void;
 }
 
 @observer
 export class Piece extends Component<IPieceProps> {
   public render() {
-    const { index, piece, imageUrl } = this.props;
-    const { position, rotation, shape } = piece;
+    const { piece, imageUrl, onMove } = this.props;
+    const { number, position, rotation, shape } = piece;
     const [cx, cy] = centroid(shape);
 
     return (
-      <g id={`piece-${index}`} transform={`translate(${cx} ${cy})`}>
+      <g transform={`translate(${cx} ${cy})`}>
         <Draggable
           position={position}
           rotation={rotation}
           radius={radius(shape)}
-          onMove={_ => (piece.position = _)}
-          onRotate={_ => (piece.rotation = _)}
+          onMove={onMove}
         >
           <g transform={`translate(${-cx} ${-cy})`}>
             <polygon
