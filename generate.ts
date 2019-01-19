@@ -1,4 +1,5 @@
 import { IPiece, IPuzzle } from "./model";
+import { range } from "./util";
 
 export async function generate(url: string, count: number): Promise<IPuzzle> {
   const image = await loadImage(url);
@@ -6,7 +7,6 @@ export async function generate(url: string, count: number): Promise<IPuzzle> {
   const aspect = width / height;
   const columns = Math.round(Math.sqrt(count * aspect));
   const rows = Math.round(columns / aspect);
-  console.log(`Generated puzzle width ${rows * columns} pieces`);
 
   const pieceHeight = 1 / aspect / rows;
   const pieceWidth = 1 / columns;
@@ -27,11 +27,10 @@ export async function generate(url: string, count: number): Promise<IPuzzle> {
     )
     .reduce((a, b) => [...a, ...b]);
 
+  console.log(`Generated puzzle width ${rows * columns} pieces`);
+
   return { url, pieces };
 }
-
-const range = (start: number, end: number) =>
-  end <= start ? [] : new Array(end - start).fill(0).map((_, i) => i + start);
 
 async function loadImage(url: string): Promise<HTMLImageElement> {
   const image = new Image();
