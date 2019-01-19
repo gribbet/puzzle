@@ -1,14 +1,11 @@
 import { observable } from "mobx";
 import { observer } from "mobx-react";
-import { Component, MouseEvent, WheelEvent } from "react";
 import * as React from "react";
-import { style } from "typestyle";
-
-import { IPuzzle, Point, IPiece } from "../model";
+import { Component } from "react";
+import { centroid, distance, radius } from "../math";
+import { IPiece, IPuzzle, Point } from "../model";
 import { Piece } from "./Piece";
-import { generate } from "../generate";
 import { Zoomable } from "./Zoomable";
-import { distance, radius, centroid } from "../math";
 
 export interface IPuzzleProps {
   puzzle: IPuzzle;

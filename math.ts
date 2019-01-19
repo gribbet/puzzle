@@ -1,4 +1,4 @@
-import { Shape, Point } from "./model";
+import { Point, Shape } from "./model";
 
 export function area(shape: Shape): number {
   return (

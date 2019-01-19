@@ -1,7 +1,6 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { cssRule } from "typestyle";
-
 import { App } from "./ui/App";
 
 cssRule("html", {

@@ -1,6 +1,5 @@
-import { Component } from "react";
 import * as React from "react";
-
+import { Component } from "react";
 import { add, dot, length, perpendicular, subtract, toDegrees } from "../math";
 import { Point } from "../model";
 
