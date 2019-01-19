@@ -6,7 +6,7 @@ export async function generate(url: string, count: number): Promise<IPuzzle> {
   const aspect = width / height;
   const columns = Math.round(Math.sqrt(count * aspect));
   const rows = Math.round(columns / aspect);
-  console.log(count, rows * columns);
+  console.log(`Generated puzzle width ${rows * columns} pieces`);
 
   const pieceHeight = 1 / aspect / rows;
   const pieceWidth = 1 / columns;
