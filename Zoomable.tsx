@@ -3,6 +3,7 @@ import { Point } from "./model";
 import { observable } from "mobx";
 import { observer } from "mobx-react";
 import * as React from "react";
+import { subtract, add } from "./math";
 
 @observer
 export class Zoomable extends Component {
@@ -28,7 +29,6 @@ export class Zoomable extends Component {
       <g
         ref={_ => (this.gRef = _ || undefined)}
         transform={this.transform(position, scale)}
-        onWheel={this.onWheel}
       >
         {children}
       </g>
@@ -43,29 +43,27 @@ export class Zoomable extends Component {
   private onWheel = (event: WheelEvent) => {
     event.preventDefault();
     event.stopPropagation();
+
     if (event.ctrlKey) {
       const ds = this.scale * event.deltaY * 0.01;
+      const a = this.toLocal([event.clientX, event.clientY]);
+      this.gRef!.setAttribute(
+        "transform",
+        this.transform(this.position, this.scale - ds)
+      );
+      const b = this.toLocal([event.clientX, event.clientY]);
 
-      const [ax, ay] = this.toLocal([event.clientX, event.clientY]);
-
-      const [bx, by] = [
-        (ax / this.scale) * (this.scale - ds),
-        (ay / this.scale) * (this.scale - ds)
-      ];
-
-      const [x, y] = this.position;
-      this.position = [x + bx - ax, y + by - ay];
-
+      this.position = add(this.position, subtract(b, a));
       this.scale -= ds;
     } else {
-      const [ax, ay] = this.toLocal([event.clientX, event.clientY]);
-      const [bx, by] = this.toLocal([
+      const a = this.toLocal([event.clientX, event.clientY]);
+      const b = this.toLocal([
         event.clientX + event.deltaX,
         event.clientY + event.deltaY
       ]);
 
       const [x, y] = this.position;
-      this.position = [x + bx - ax, y + by - ay];
+      this.position = add(this.position, subtract(b, a));
     }
   };
 
