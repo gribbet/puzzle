@@ -3,8 +3,8 @@ import * as React from "react";
 import { Component } from "react";
 
 import { Draggable } from "./Draggable";
-import { centroid, radius } from "./math";
-import { IPiece, Point } from "./model";
+import { centroid, radius } from "../math";
+import { IPiece, Point } from "../model";
 
 export interface IPieceProps {
   piece: IPiece;

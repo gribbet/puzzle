@@ -4,9 +4,9 @@ import { Component, MouseEvent, WheelEvent } from "react";
 import * as React from "react";
 import { style } from "typestyle";
 
-import { IPuzzle, Point } from "./model";
+import { IPuzzle, Point } from "../model";
 import { Piece } from "./Piece";
-import { generate } from "./generate";
+import { generate } from "../generate";
 import { Zoomable } from "./Zoomable";
 
 export interface IPuzzleProps {

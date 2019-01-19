@@ -1,9 +1,9 @@
 import { Component } from "react";
-import { Point } from "./model";
+import { Point } from "../model";
 import { observable } from "mobx";
 import { observer } from "mobx-react";
 import * as React from "react";
-import { subtract, add } from "./math";
+import { subtract, add } from "../math";
 
 @observer
 export class Zoomable extends Component {

@@ -1,8 +1,8 @@
 import { Component } from "react";
 import * as React from "react";
 
-import { add, dot, length, perpendicular, subtract, toDegrees } from "./math";
-import { Point } from "./model";
+import { add, dot, length, perpendicular, subtract, toDegrees } from "../math";
+import { Point } from "../model";
 
 export interface IDraggableProps {
   position: Point;
