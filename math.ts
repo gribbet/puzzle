@@ -39,19 +39,16 @@ export function angle(
   [ax, ay]: Point,
   [bx, by]: Point
 ): number {
-  return (
-    ((Math.atan2(by - vy, bx - vx) - Math.atan2(ay - vy, ax - vx)) / Math.PI) *
-    180
-  );
+  return toDegrees(Math.atan2(by - vy, bx - vx) - Math.atan2(ay - vy, ax - vx));
 }
 
-export function distance([ax, ay]: Point, [bx, by]: Point): number {
-  return Math.sqrt((bx - ax) * (bx - ax) + (by - ay) * (by - ay));
+export function distance(a: Point, b: Point): number {
+  return length(subtract(b, a));
 }
 
 export function rotate([x, y]: Point, angle: number): Point {
-  const c = Math.cos((angle / 180) * Math.PI);
-  const s = Math.sin((angle / 180) * Math.PI);
+  const c = Math.cos(toRadians(angle));
+  const s = Math.sin(toRadians(angle));
   return [c * x - s * y, s * x + c * y];
 }
 
@@ -85,4 +82,12 @@ export function scale([x, y]: Point, a: number): Point {
 
 export function toDegrees(x: number): number {
   return (x / Math.PI) * 180;
+}
+
+export function toRadians(x: number): number {
+  return (x * Math.PI) / 180;
+}
+
+export function normalizeAngle(x: number): number {
+  return ((x + 180) % 360) - 180;
 }

@@ -2,7 +2,7 @@ import { observable } from "mobx";
 import { observer } from "mobx-react";
 import * as React from "react";
 import { Component } from "react";
-import { centroid, distance, radius } from "../math";
+import { centroid, distance, normalizeAngle, radius } from "../math";
 import { IPiece, IPuzzle, Point } from "../model";
 import { Piece } from "./Piece";
 import { Zoomable } from "./Zoomable";
@@ -15,6 +15,7 @@ export interface IPuzzleProps {
 export class Puzzle extends Component<IPuzzleProps> {
   @observable
   private puzzle: IPuzzle = this.props.puzzle;
+  private pieces: (Piece | undefined)[] = [];
 
   public render() {
     const { puzzle } = this;
@@ -23,8 +24,9 @@ export class Puzzle extends Component<IPuzzleProps> {
     return (
       <svg viewBox={`0 0 1 1`} width="100%" height="100%">
         <Zoomable>
-          {pieces.map(piece => (
+          {pieces.map((piece, i) => (
             <Piece
+              ref={_ => (this.pieces[i] = _ || undefined)}
               key={piece.number}
               piece={piece}
               imageUrl={puzzle.url}
@@ -51,8 +53,8 @@ export class Puzzle extends Component<IPuzzleProps> {
     const match = others.find(
       _ =>
         _ !== piece &&
-        Math.abs(_.rotation - rotation) < 10 &&
-        distance(_.position, position) < 0.01 &&
+        Math.abs(normalizeAngle(_.rotation - rotation)) < 15 &&
+        distance(_.position, position) < 0.1 * radius(piece.shape) &&
         distance(centroid(_.shape), centroid(piece.shape)) <=
           radius(_.shape) + radius(piece.shape)
     );

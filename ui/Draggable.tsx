@@ -1,11 +1,21 @@
 import * as React from "react";
 import { Component } from "react";
-import { add, dot, length, perpendicular, subtract, toDegrees } from "../math";
+import {
+  add,
+  dot,
+  length,
+  normalizeAngle,
+  perpendicular,
+  rotate,
+  subtract,
+  toDegrees
+} from "../math";
 import { Point } from "../model";
 
 export interface IDraggableProps {
   position: Point;
   rotation: number;
+  center: Point;
   radius: number;
   onMove: (_: { position: Point; rotation: number }) => void;
 }
@@ -24,11 +34,12 @@ export class Draggable extends Component<IDraggableProps> {
 
   public render() {
     const { position, rotation, children } = this.props;
+    const [x, y] = position;
 
     return (
       <g
         ref={_ => (this.gRef = _ || undefined)}
-        transform={this.transform(position, rotation)}
+        transform={`rotate(${rotation}) translate(${x} ${y})`}
         onMouseDown={this.onMouseDown}
       >
         {children}
@@ -36,7 +47,7 @@ export class Draggable extends Component<IDraggableProps> {
     );
   }
 
-  private toLocal(point: Point): Point {
+  private screenToLocal(point: Point): Point {
     const [x0, y0] = point;
     const { x, y } = new DOMPoint(x0, y0).matrixTransform(
       this.gRef!.getScreenCTM()!.inverse()
@@ -44,13 +55,11 @@ export class Draggable extends Component<IDraggableProps> {
     return [x, y];
   }
 
-  private transform(position: Point, rotation: number) {
-    const [x, y] = position;
-    return `rotate(${rotation}) translate(${x} ${y})`;
-  }
-
   private onMouseDown = ({ clientX, clientY }: React.MouseEvent) => {
-    this.dragging = this.toLocal([clientX, clientY]);
+    this.dragging = subtract(
+      this.screenToLocal([clientX, clientY]),
+      this.props.center
+    );
   };
 
   private onMouseMove = (event: MouseEvent) => {
@@ -62,30 +71,28 @@ export class Draggable extends Component<IDraggableProps> {
       return;
     }
 
-    const { position, rotation, radius, onMove } = this.props;
+    const { position, rotation, center, radius, onMove } = this.props;
     const { clientX, clientY, movementX, movementY } = event;
 
     const client: Point = [clientX, clientY];
     const movement: Point = [movementX, movementY];
 
-    const x0 = this.toLocal(subtract(client, movement));
-    const x = this.toLocal(client);
-    const dr = toDegrees(
-      (dot(subtract(x, x0), perpendicular(this.dragging)) /
-        radius /
-        radius /
-        radius) *
-        length(this.dragging)
-    );
-
-    this.gRef.setAttribute(
-      "transform",
-      this.transform(position, rotation + dr)
-    );
+    const x0 = this.screenToLocal(subtract(client, movement));
+    const x = this.screenToLocal(client);
+    const dr =
+      toDegrees(
+        dot(subtract(x, x0), perpendicular(this.dragging)) /
+          radius /
+          radius /
+          radius
+      ) * length(this.dragging);
 
     onMove({
-      position: add(position, subtract(this.toLocal(client), this.dragging)),
-      rotation: rotation + dr
+      position: subtract(
+        rotate(add(x, position), -dr),
+        add(center, this.dragging)
+      ),
+      rotation: normalizeAngle(rotation + dr)
     });
   };
 }

@@ -1,4 +1,5 @@
-import { IPiece, IPuzzle } from "./model";
+import { centroid, subtract } from "./math";
+import { IPiece, IPuzzle, Shape } from "./model";
 import { range } from "./util";
 
 export async function generate(url: string, count: number): Promise<IPuzzle> {
@@ -13,17 +14,21 @@ export async function generate(url: string, count: number): Promise<IPuzzle> {
   const offset = (1 - 1 / aspect) / 2;
   const pieces = range(0, columns)
     .map(i =>
-      range(0, rows).map<IPiece>(j => ({
-        number: i * columns + j,
-        position: [0, 0],
-        rotation: 0,
-        shape: [
+      range(0, rows).map<IPiece>(j => {
+        const shape: Shape = [
           [i * pieceWidth, j * pieceHeight + offset],
           [(i + 1) * pieceWidth, j * pieceHeight + offset],
           [(i + 1) * pieceWidth, (j + 1) * pieceHeight + offset],
           [i * pieceWidth, (j + 1) * pieceHeight + offset]
-        ]
-      }))
+        ];
+
+        return {
+          number: i * columns + j,
+          position: subtract([Math.random(), Math.random()], centroid(shape)),
+          rotation: (Math.random() - 0.5) * 360,
+          shape
+        };
+      })
     )
     .reduce((a, b) => [...a, ...b]);
 
