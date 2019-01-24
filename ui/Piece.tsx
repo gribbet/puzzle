@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Component } from "react";
+import { PureComponent } from "react";
 import { centroid, radius } from "../math";
 import { IPiece, Point } from "../model";
 import { Draggable } from "./Draggable";
@@ -7,12 +7,12 @@ import { Draggable } from "./Draggable";
 export interface IPieceProps {
   piece: IPiece;
   imageUrl: string;
-  onMove: (_: { position: Point; rotation: number }) => void;
+  onMove: (_: { number: number; position: Point; rotation: number }) => void;
 }
 
-export class Piece extends Component<IPieceProps> {
+export class Piece extends PureComponent<IPieceProps> {
   public render() {
-    const { piece, imageUrl, onMove } = this.props;
+    const { piece, imageUrl } = this.props;
     const { position, rotation, shape } = piece;
 
     return (
@@ -21,7 +21,7 @@ export class Piece extends Component<IPieceProps> {
         rotation={rotation}
         center={centroid(shape)}
         radius={radius(shape)}
-        onMove={onMove}
+        onMove={this.onMove}
       >
         <image
           xlinkHref={imageUrl}
@@ -34,12 +34,24 @@ export class Piece extends Component<IPieceProps> {
         />
         <polygon
           points={shape.map(([x, y]) => `${x} ${y}`).join(", ")}
-          stroke="#ffffff40"
-          strokeWidth="0.5px"
+          stroke="#00000040"
+          strokeWidth="1px"
           fill="none"
           vectorEffect="non-scaling-stroke"
         />
       </Draggable>
     );
   }
+
+  private onMove = ({
+    position,
+    rotation
+  }: {
+    position: Point;
+    rotation: number;
+  }) => {
+    const { piece, onMove } = this.props;
+    const { number } = piece;
+    onMove({ number, position, rotation });
+  };
 }
