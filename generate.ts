@@ -12,14 +12,14 @@ export async function generate(url: string, count: number): Promise<IPuzzle> {
   const pieceWidth = 1 / columns;
   const offset = (1 - 1 / aspect) / 2;
 
-  const horizontalEdge = (i: number, j: number) =>
-    shape.map<Point>(([x, y]) => [
+  const horizontal = (i: number, j: number) =>
+    (j === 0 || j === rows ? edge : shape).map<Point>(([x, y]) => [
       (x + i) * pieceWidth,
       (y + j) * pieceHeight + offset
     ]);
 
-  const verticalEdge = (i: number, j: number) =>
-    shape.map<Point>(([x, y]) => [
+  const vertical = (i: number, j: number) =>
+    (i === 0 || i === columns ? edge : shape).map<Point>(([x, y]) => [
       (y + i) * pieceWidth,
       (x + j) * pieceHeight + offset
     ]);
@@ -28,12 +28,12 @@ export async function generate(url: string, count: number): Promise<IPuzzle> {
     .map(i =>
       range(0, rows).map<IPiece>(j => {
         const shape: Shape = [
-          ...horizontalEdge(i, j),
-          ...verticalEdge(i + 1, j).slice(1),
-          ...horizontalEdge(i, j + 1)
+          ...horizontal(i, j),
+          ...vertical(i + 1, j).slice(1),
+          ...horizontal(i, j + 1)
             .reverse()
             .slice(1),
-          ...verticalEdge(i, j)
+          ...vertical(i, j)
             .reverse()
             .slice(1)
         ];
@@ -60,6 +60,8 @@ async function loadImage(url: string): Promise<HTMLImageElement> {
   await loaded;
   return image;
 }
+
+const edge: Shape = [[0, 0], [1, 0], [1, 0], [1, 0]];
 
 const shape: Shape = [
   [0, 0],
