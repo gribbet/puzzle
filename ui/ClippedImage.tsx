@@ -40,8 +40,8 @@ export class ClippedImage extends PureComponent<IClippedImageProps> {
         />
         <path
           d={path}
-          stroke="#00000040"
-          strokeWidth="1px"
+          stroke="#000000"
+          strokeWidth="0.75px"
           fill="none"
           vectorEffect="non-scaling-stroke"
         />
