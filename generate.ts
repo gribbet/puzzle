@@ -1,5 +1,4 @@
-import { centroid, subtract } from "./math";
-import { IPiece, IPuzzle, Shape } from "./model";
+import { IPiece, IPuzzle, Point, Shape } from "./model";
 import { range } from "./util";
 
 export async function generate(url: string, count: number): Promise<IPuzzle> {
@@ -12,20 +11,37 @@ export async function generate(url: string, count: number): Promise<IPuzzle> {
   const pieceHeight = 1 / aspect / rows;
   const pieceWidth = 1 / columns;
   const offset = (1 - 1 / aspect) / 2;
+
+  const horizontalEdge = (i: number, j: number) =>
+    shape.map<Point>(([x, y]) => [
+      (x + i) * pieceWidth,
+      (y + j) * pieceHeight + offset
+    ]);
+
+  const verticalEdge = (i: number, j: number) =>
+    shape.map<Point>(([x, y]) => [
+      (y + i) * pieceWidth,
+      (x + j) * pieceHeight + offset
+    ]);
+
   const pieces = range(0, columns)
     .map(i =>
       range(0, rows).map<IPiece>(j => {
         const shape: Shape = [
-          [i * pieceWidth, j * pieceHeight + offset],
-          [(i + 1) * pieceWidth, j * pieceHeight + offset],
-          [(i + 1) * pieceWidth, (j + 1) * pieceHeight + offset],
-          [i * pieceWidth, (j + 1) * pieceHeight + offset]
+          ...horizontalEdge(i, j),
+          ...verticalEdge(i + 1, j).slice(1),
+          ...horizontalEdge(i, j + 1)
+            .reverse()
+            .slice(1),
+          ...verticalEdge(i, j)
+            .reverse()
+            .slice(1)
         ];
 
         return {
           number: i * columns + j,
-          position: subtract([Math.random(), Math.random()], centroid(shape)),
-          rotation: (Math.random() - 0.5) * 360,
+          position: [0, 0],
+          rotation: 0,
           shape
         };
       })
@@ -44,3 +60,31 @@ async function loadImage(url: string): Promise<HTMLImageElement> {
   await loaded;
   return image;
 }
+
+const shape: Shape = [
+  [0, 0],
+  [0.28, 0],
+  [0.28, 0],
+  [0.28, 0],
+  [0.35, 0],
+  [0.3746, 0.025],
+  [0.3625, 0.0775],
+  [0.3544, 0.1125],
+  [0.35, 0.12],
+  [0.35, 0.15],
+  [0.35, 0.233],
+  [0.417, 0.3],
+  [0.5, 0.3],
+  [0.583, 0.3],
+  [0.65, 0.233],
+  [0.65, 0.15],
+  [0.65, 0.12],
+  [0.6456, 0.1125],
+  [0.6375, 0.0775],
+  [0.6254, 0.025],
+  [0.65, 0],
+  [0.72, 0],
+  [1, 0],
+  [1, 0],
+  [1, 0]
+];

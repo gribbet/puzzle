@@ -13,7 +13,7 @@ export class App extends Component {
   private puzzle?: IPuzzle;
 
   public async componentWillMount() {
-    this.puzzle = await generate("https://i.redd.it/4st67jvypha21.jpg", 10);
+    this.puzzle = await generate("https://i.redd.it/4st67jvypha21.jpg", 100);
   }
 
   public render() {

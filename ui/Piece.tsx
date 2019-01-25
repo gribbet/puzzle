@@ -13,7 +13,16 @@ export interface IPieceProps {
 export class Piece extends PureComponent<IPieceProps> {
   public render() {
     const { piece, imageUrl } = this.props;
-    const { position, rotation, shape } = piece;
+    const { number, position, rotation, shape } = piece;
+
+    const path = shape
+      .map(
+        ([x, y], i) =>
+          `${(i === 0 && "M") || (i % 3 == 1 && "C") || " "}${x.toFixed(
+            3
+          )} ${y.toFixed(3)}`
+      )
+      .reduce((a, b) => a + b);
 
     return (
       <Draggable
@@ -23,17 +32,20 @@ export class Piece extends PureComponent<IPieceProps> {
         radius={radius(shape)}
         onMove={this.onMove}
       >
+        <clipPath id={`clip-${number}`}>
+          <path d={path} />
+        </clipPath>
         <image
           xlinkHref={imageUrl}
           x={0}
           y={0}
           width={1}
           height={1}
-          clipPath={`polygon(${shape.map(([x, y]) => `${x} ${y}`).join(", ")})`}
+          clipPath={`url(#clip-${number})`}
           cursor="pointer"
         />
-        <polygon
-          points={shape.map(([x, y]) => `${x} ${y}`).join(", ")}
+        <path
+          d={path}
           stroke="#00000040"
           strokeWidth="1px"
           fill="none"
