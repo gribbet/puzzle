@@ -62,8 +62,7 @@ export class Zoomable extends Component {
         event.clientY + event.deltaY
       ]);
 
-      const [x, y] = this.position;
-      this.position = add(this.position, subtract(b, a));
+      this.position = subtract(this.position, subtract(b, a));
     }
   };
 
