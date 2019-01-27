@@ -2,7 +2,13 @@ import { observable } from "mobx";
 import { observer } from "mobx-react";
 import * as React from "react";
 import { Component } from "react";
-import { centroid, distance, normalizeAngle, radius } from "../math";
+import {
+  boundingRadius,
+  centroid,
+  distance,
+  normalizeAngle,
+  rotate
+} from "../math";
 import { IPiece, IPuzzle, Point } from "../model";
 import { Piece } from "./Piece";
 import { Zoomable } from "./Zoomable";
@@ -65,27 +71,32 @@ export class Puzzle extends Component<IPuzzleProps> {
     const match = others.find(
       _ =>
         _ !== piece &&
-        Math.abs(normalizeAngle(_.rotation - rotation)) < 30 &&
-        distance(_.position, position) < 0.5 * this.radius(piece) &&
+        Math.abs(normalizeAngle(_.rotation - rotation)) < 10 &&
+        distance(rotate(_.position, _.rotation), rotate(position, rotation)) <
+          0.01 &&
         distance(this.centroid(_), this.centroid(piece)) <=
           this.radius(_) + this.radius(piece)
     );
 
     if (match) {
-      position = match.position;
-      rotation = match.rotation;
+      puzzle.pieces = [
+        ...others.filter(_ => _ !== match),
+        { ...match, shapes: [...match.shapes, ...piece.shapes] }
+      ];
+    } else {
+      puzzle.pieces = [...others, { ...piece, position, rotation }];
     }
-
-    puzzle.pieces = [...others, { ...piece, position, rotation }];
   };
 
   private centroid(piece: IPiece) {
     return (this.centroids[piece.number] =
-      this.centroids[piece.number] || centroid(piece.shape));
+      this.centroids[piece.number] ||
+      centroid(piece.shapes.reduce((a, b) => [...a, ...b])));
   }
 
   private radius(piece: IPiece) {
-    return (this.radiuses[piece.number] =
-      this.radiuses[piece.number] || radius(piece.shape));
+    return (this.radiuses[piece.number] = boundingRadius(
+      piece.shapes.reduce((a, b) => [...a, ...b])
+    ));
   }
 }

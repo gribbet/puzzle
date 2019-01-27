@@ -53,7 +53,7 @@ export async function generate(
             subtract([0, 0], centroid(shape))
           ),
           rotation,
-          shape
+          shapes: [shape]
         };
       })
     )

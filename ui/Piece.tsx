@@ -14,17 +14,21 @@ export interface IPieceProps {
 export class Piece extends PureComponent<IPieceProps> {
   public render() {
     const { piece, imageUrl } = this.props;
-    const { position, rotation, shape } = piece;
+    const { position, rotation, shapes } = piece;
+
+    const combined = shapes.reduce((a, b) => [...a, ...b]);
 
     return (
       <Draggable
         position={position}
         rotation={rotation}
-        center={centroid(shape)}
-        radius={radius(shape)}
+        center={centroid(combined)}
+        radius={radius(combined)}
         onMove={this.onMove}
       >
-        <ClippedImage imageUrl={imageUrl} shape={shape} />
+        {shapes.map((shape, i) => (
+          <ClippedImage key={i} imageUrl={imageUrl} shape={shape} />
+        ))}
       </Draggable>
     );
   }

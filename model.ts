@@ -6,7 +6,7 @@ export interface IPiece {
   number: number;
   position: Point;
   rotation: number;
-  shape: Shape;
+  shapes: Shape[];
 }
 
 export interface IPuzzle {

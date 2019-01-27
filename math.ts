@@ -34,6 +34,16 @@ export function radius(shape: Shape): number {
   );
 }
 
+export function boundingRadius(shape: Shape): number {
+  const c = centroid(shape);
+  return Math.sqrt(
+    shape
+      .map(x => subtract(x, c))
+      .map(([x, y]) => x * x + y * y)
+      .reduce((a, b) => Math.max(a, b))
+  );
+}
+
 export function angle(
   [vx, vy]: Point,
   [ax, ay]: Point,
@@ -89,5 +99,5 @@ export function toRadians(x: number): number {
 }
 
 export function normalizeAngle(x: number): number {
-  return ((x + 180) % 360) - 180;
+  return ((x % 360) + 360) % 360;
 }
