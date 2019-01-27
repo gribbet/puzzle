@@ -16,17 +16,19 @@ export async function generate(
   const pieceWidth = 1 / columns;
   const offset = (1 - 1 / aspect) / 2;
 
+  const flips = range(0, columns + 1).map(_ =>
+    range(0, rows + 1).map(_ => range(0, 2).map(_ => Math.random() < 0.5))
+  );
+
   const horizontal = (i: number, j: number) =>
-    (j === 0 || j === rows ? edge : shape).map<Point>(([x, y]) => [
-      (x + i) * pieceWidth,
-      (y + j) * pieceHeight + offset
-    ]);
+    (j === 0 || j === rows ? edge : flips[i][j][0] ? flipped : shape).map<
+      Point
+    >(([x, y]) => [(x + i) * pieceWidth, (y + j) * pieceHeight + offset]);
 
   const vertical = (i: number, j: number) =>
-    (i === 0 || i === columns ? edge : shape).map<Point>(([x, y]) => [
-      (y + i) * pieceWidth,
-      (x + j) * pieceHeight + offset
-    ]);
+    (i === 0 || i === columns ? edge : flips[i][j][1] ? flipped : shape).map<
+      Point
+    >(([x, y]) => [(y + i) * pieceWidth, (x + j) * pieceHeight + offset]);
 
   const pieces = range(0, columns)
     .map(i =>
@@ -99,3 +101,5 @@ const shape: Shape = [
   [1, 0],
   [1, 0]
 ];
+
+const flipped = shape.map(([x, y]) => [x, -y]);
