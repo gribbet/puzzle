@@ -15,14 +15,15 @@ export class ClippedImage extends PureComponent<IClippedImageProps> {
   public render() {
     const { imageUrl, shape } = this.props;
 
-    const path = shape
-      .map(
-        ([x, y], i) =>
-          `${(i === 0 && "M") || (i % 3 == 1 && "C") || " "}${x.toFixed(
-            4
-          )} ${y.toFixed(4)}`
-      )
-      .reduce((a, b) => a + b);
+    const path =
+      shape
+        .map(
+          ([x, y], i) =>
+            `${(i === 0 && "M") || (i % 3 == 1 && "C") || " "}${x.toFixed(
+              4
+            )} ${y.toFixed(4)}`
+        )
+        .reduce((a, b) => a + b) + "Z";
 
     return (
       <g>

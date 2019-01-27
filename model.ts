@@ -10,6 +10,6 @@ export interface IPiece {
 }
 
 export interface IPuzzle {
-  url: string;
+  imageUrl: string;
   pieces: IPiece[];
 }

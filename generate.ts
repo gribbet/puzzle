@@ -1,8 +1,12 @@
+import { add, centroid, rotate, subtract } from "./math";
 import { IPiece, IPuzzle, Point, Shape } from "./model";
 import { range } from "./util";
 
-export async function generate(url: string, count: number): Promise<IPuzzle> {
-  const image = await loadImage(url);
+export async function generate(
+  imageUrl: string,
+  count: number
+): Promise<IPuzzle> {
+  const image = await loadImage(imageUrl);
   const { width, height } = image;
   const aspect = width / height;
   const columns = Math.round(Math.sqrt(count * aspect));
@@ -38,10 +42,15 @@ export async function generate(url: string, count: number): Promise<IPuzzle> {
             .slice(1)
         ];
 
+        const rotation = (Math.random() - 0.5) * 360;
+
         return {
           number: i * columns + j,
-          position: [0, 0],
-          rotation: 0,
+          position: add(
+            rotate([Math.random(), Math.random()], -rotation),
+            subtract([0, 0], centroid(shape))
+          ),
+          rotation,
           shape
         };
       })
@@ -50,7 +59,7 @@ export async function generate(url: string, count: number): Promise<IPuzzle> {
 
   console.log(`Generated puzzle width ${rows * columns} pieces`);
 
-  return { url, pieces };
+  return { imageUrl, pieces };
 }
 
 async function loadImage(url: string): Promise<HTMLImageElement> {
