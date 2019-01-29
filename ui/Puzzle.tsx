@@ -24,7 +24,7 @@ export class Puzzle extends Component<IPuzzleProps> {
 
   public render() {
     const { puzzle } = this;
-    const { imageUrl: url, pieces } = puzzle;
+    const { imageUrl, pieces } = puzzle;
 
     return (
       <svg
@@ -38,7 +38,7 @@ export class Puzzle extends Component<IPuzzleProps> {
             <Piece
               key={piece.number}
               piece={piece}
-              imageUrl={puzzle.imageUrl}
+              imageUrl={imageUrl}
               onMove={this.onMovePiece}
             />
           ))}
