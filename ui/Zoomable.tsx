@@ -4,6 +4,7 @@ import * as React from "react";
 import { Component } from "react";
 import { add, subtract } from "../math";
 import { Point } from "../model";
+import { screenToLocal } from "../svg";
 
 @observer
 export class Zoomable extends Component {
@@ -46,18 +47,18 @@ export class Zoomable extends Component {
 
     if (event.ctrlKey) {
       const ds = this.scale * event.deltaY * 0.01;
-      const a = this.toLocal([event.clientX, event.clientY]);
+      const a = screenToLocal(this.gRef!, [event.clientX, event.clientY]);
       this.gRef!.setAttribute(
         "transform",
         this.transform(this.position, this.scale - ds)
       );
-      const b = this.toLocal([event.clientX, event.clientY]);
+      const b = screenToLocal(this.gRef!, [event.clientX, event.clientY]);
 
       this.position = add(this.position, subtract(b, a));
       this.scale -= ds;
     } else {
-      const a = this.toLocal([event.clientX, event.clientY]);
-      const b = this.toLocal([
+      const a = screenToLocal(this.gRef!, [event.clientX, event.clientY]);
+      const b = screenToLocal(this.gRef!, [
         event.clientX + event.deltaX,
         event.clientY + event.deltaY
       ]);
@@ -65,12 +66,4 @@ export class Zoomable extends Component {
       this.position = subtract(this.position, subtract(b, a));
     }
   };
-
-  private toLocal(point: Point): Point {
-    const [x0, y0] = point;
-    const { x, y } = new DOMPoint(x0, y0).matrixTransform(
-      this.gRef!.getScreenCTM()!.inverse()
-    );
-    return [x, y];
-  }
 }

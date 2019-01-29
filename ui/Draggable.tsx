@@ -11,6 +11,7 @@ import {
   toDegrees
 } from "../math";
 import { Point } from "../model";
+import { screenToLocal } from "../svg";
 
 export interface IDraggableProps {
   position: Point;
@@ -47,16 +48,9 @@ export class Draggable extends Component<IDraggableProps> {
     );
   }
 
-  private screenToLocal(point: Point): Point {
-    const [x0, y0] = point;
-    const { x, y } = new DOMPoint(x0, y0).matrixTransform(
-      this.gRef!.getScreenCTM()!.inverse()
-    );
-    return [x, y];
-  }
-
-  private onMouseDown = ({ clientX, clientY }: React.MouseEvent) =>
-    (this.dragging = this.screenToLocal([clientX, clientY]));
+  private onMouseDown = ({ clientX, clientY }: React.MouseEvent) => {
+    this.dragging = screenToLocal(this.gRef!, [clientX, clientY]);
+  };
 
   private onMouseMove = (event: MouseEvent) => {
     if (!event.buttons) {
@@ -74,8 +68,8 @@ export class Draggable extends Component<IDraggableProps> {
     const movement: Point = [movementX, movementY];
     const dragging = subtract(this.dragging, center);
 
-    const x0 = this.screenToLocal(subtract(client, movement));
-    const x = this.screenToLocal(client);
+    const x0 = screenToLocal(this.gRef, subtract(client, movement));
+    const x = screenToLocal(this.gRef, client);
     const dr =
       toDegrees(
         dot(subtract(x, x0), perpendicular(dragging)) / radius / radius / radius
