@@ -12,9 +12,12 @@ export async function generate(
   const columns = Math.round(Math.sqrt(count * aspect));
   const rows = Math.round(columns / aspect);
 
-  const pieceHeight = 1 / aspect / rows;
-  const pieceWidth = 1 / columns;
-  const offset = (1 - 1 / aspect) / 2;
+  const tall = height > width;
+
+  const pieceHeight = 1 / (tall ? 1 : aspect) / rows;
+  const pieceWidth = (1 * (tall ? aspect : 1)) / columns;
+  const offsetX = tall ? (1 - aspect) / 2 : 0;
+  const offsetY = tall ? 0 : (1 - 1 / aspect) / 2;
 
   const flips = range(0, columns + 1).map(_ =>
     range(0, rows + 1).map(_ => range(0, 2).map(_ => Math.random() < 0.5))
@@ -23,12 +26,18 @@ export async function generate(
   const horizontal = (i: number, j: number) =>
     (j === 0 || j === rows ? edge : flips[i][j][0] ? flipped : shape).map<
       Point
-    >(([x, y]) => [(x + i) * pieceWidth, (y + j) * pieceHeight + offset]);
+    >(([x, y]) => [
+      (x + i) * pieceWidth + offsetX,
+      (y + j) * pieceHeight + offsetY
+    ]);
 
   const vertical = (i: number, j: number) =>
     (i === 0 || i === columns ? edge : flips[i][j][1] ? flipped : shape).map<
       Point
-    >(([x, y]) => [(y + i) * pieceWidth, (x + j) * pieceHeight + offset]);
+    >(([x, y]) => [
+      (y + i) * pieceWidth + offsetX,
+      (x + j) * pieceHeight + offsetY
+    ]);
 
   const pieces = range(0, columns)
     .map(i =>
@@ -47,7 +56,7 @@ export async function generate(
         const rotation = (Math.random() - 0.5) * 360;
 
         return {
-          number: i * columns + j,
+          number: j * columns + i,
           position: add(
             rotate([Math.random(), Math.random()], -rotation),
             subtract([0, 0], centroid(shape))
