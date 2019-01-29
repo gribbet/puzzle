@@ -39,13 +39,6 @@ export class ClippedImage extends PureComponent<IClippedImageProps> {
           clipPath={`url(#clip-${this.index})`}
           cursor="pointer"
         />
-        <path
-          d={path}
-          stroke="#000000"
-          strokeWidth="0.75px"
-          fill="none"
-          vectorEffect="non-scaling-stroke"
-        />
       </g>
     );
   }
