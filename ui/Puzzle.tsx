@@ -5,11 +5,11 @@ import { Component } from "react";
 import {
   boundingRadius,
   centroid,
-  distance,
+  length,
   normalizeAngle,
-  rotate
+  subtract
 } from "../math";
-import { IPiece, IPuzzle, Point } from "../model";
+import { IPiece, IPuzzle, Point, Shape } from "../model";
 import { Piece } from "./Piece";
 import { Zoomable } from "./Zoomable";
 
@@ -21,8 +21,6 @@ export interface IPuzzleProps {
 export class Puzzle extends Component<IPuzzleProps> {
   @observable
   private puzzle: IPuzzle = this.props.puzzle;
-  private centroids: { [number: number]: Point } = {};
-  private radiuses: { [number: number]: number } = {};
 
   public render() {
     const { puzzle } = this;
@@ -68,35 +66,38 @@ export class Puzzle extends Component<IPuzzleProps> {
 
     const others = pieces.filter(_ => _ !== piece);
 
+    const angleThreshold = 10;
+    const distanceThreshold = 0.01;
+
+    const angle = (_: IPiece) => {
+      const angle = normalizeAngle(_.rotation - rotation);
+      return Math.min(angle, 360 - angle);
+    };
+    const distance = (_: IPiece) => length(subtract(_.position, position));
+    const adjacentShape = (a: Shape, b: Shape) =>
+      length(subtract(centroid(a), centroid(b))) <=
+      boundingRadius(a) + boundingRadius(b);
+    const adjacent = (_: IPiece) =>
+      piece.shapes
+        .map(a => _.shapes.map(b => [a, b]))
+        .reduce((a, b) => [...a, ...b])
+        .reduce((adjacent, [a, b]) => adjacent || adjacentShape(a, b), false);
+
     const match = others.find(
       _ =>
-        _ !== piece &&
-        Math.abs(normalizeAngle(_.rotation - rotation)) < 10 &&
-        distance(rotate(_.position, _.rotation), rotate(position, rotation)) <
-          0.01 &&
-        distance(this.centroid(_), this.centroid(piece)) <=
-          this.radius(_) + this.radius(piece)
+        angle(_) < angleThreshold &&
+        distance(_) < distanceThreshold &&
+        adjacent(_)
     );
 
-    if (match) {
-      puzzle.pieces = [
-        ...others.filter(_ => _ !== match),
-        { ...match, shapes: [...match.shapes, ...piece.shapes] }
-      ];
-    } else {
-      puzzle.pieces = [...others, { ...piece, position, rotation }];
-    }
+    puzzle.pieces = [
+      ...others.filter(_ => _ !== match),
+      {
+        ...piece,
+        position,
+        rotation,
+        shapes: [...piece.shapes, ...(match ? match.shapes : [])]
+      }
+    ];
   };
-
-  private centroid(piece: IPiece) {
-    return (this.centroids[piece.number] =
-      this.centroids[piece.number] ||
-      centroid(piece.shapes.reduce((a, b) => [...a, ...b])));
-  }
-
-  private radius(piece: IPiece) {
-    return (this.radiuses[piece.number] = boundingRadius(
-      piece.shapes.reduce((a, b) => [...a, ...b])
-    ));
-  }
 }
