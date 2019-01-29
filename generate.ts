@@ -58,7 +58,13 @@ export async function generate(
         return {
           number: j * columns + i,
           position: add(
-            rotate([Math.random(), Math.random()], -rotation),
+            rotate(
+              [
+                Math.random() * (1 - pieceWidth) + pieceWidth / 2,
+                Math.random() * (1 - pieceHeight) + pieceHeight / 2
+              ],
+              -rotation
+            ),
             subtract([0, 0], centroid(shape))
           ),
           rotation,
