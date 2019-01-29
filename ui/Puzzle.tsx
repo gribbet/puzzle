@@ -31,7 +31,9 @@ export class Puzzle extends Component<IPuzzleProps> {
         viewBox={`0 0 1 1`}
         width="100%"
         height="100%"
-        style={{ background: "#e0e0e0" }}
+        style={{
+          background: `#101010`
+        }}
       >
         <Zoomable>
           {pieces.map(piece => (
