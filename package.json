@@ -15,7 +15,7 @@
     "typestyle": "^2.0.1"
   },
   "scripts": {
-    "start": "parcel index.html"
+    "start": "parcel source/index.html"
   },
   "browserslist": [
     "since 2017-06"

@@ -7,13 +7,16 @@ import { generate } from "../generate";
 import { IPuzzle } from "../model";
 import { Puzzle } from "./Puzzle";
 
+// TODO: Perlin offset
+// TODO: Firefox dragging
+
 @observer
 export class App extends Component {
   @observable
   private puzzle?: IPuzzle;
 
   public async componentWillMount() {
-    this.puzzle = await generate("https://i.redd.it/4st67jvypha21.jpg", 10);
+    this.puzzle = await generate("https://i.redd.it/zzz4o8zgf9d21.jpg", 20);
   }
 
   public render() {
