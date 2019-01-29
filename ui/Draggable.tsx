@@ -55,12 +55,8 @@ export class Draggable extends Component<IDraggableProps> {
     return [x, y];
   }
 
-  private onMouseDown = ({ clientX, clientY }: React.MouseEvent) => {
-    this.dragging = subtract(
-      this.screenToLocal([clientX, clientY]),
-      this.props.center
-    );
-  };
+  private onMouseDown = ({ clientX, clientY }: React.MouseEvent) =>
+    (this.dragging = this.screenToLocal([clientX, clientY]));
 
   private onMouseMove = (event: MouseEvent) => {
     if (!event.buttons) {
@@ -76,22 +72,17 @@ export class Draggable extends Component<IDraggableProps> {
 
     const client: Point = [clientX, clientY];
     const movement: Point = [movementX, movementY];
+    const dragging = subtract(this.dragging, center);
 
     const x0 = this.screenToLocal(subtract(client, movement));
     const x = this.screenToLocal(client);
     const dr =
       toDegrees(
-        dot(subtract(x, x0), perpendicular(this.dragging)) /
-          radius /
-          radius /
-          radius
-      ) * length(this.dragging);
+        dot(subtract(x, x0), perpendicular(dragging)) / radius / radius / radius
+      ) * length(dragging);
 
     onMove({
-      position: subtract(
-        rotate(add(x, position), -dr),
-        add(center, this.dragging)
-      ),
+      position: subtract(rotate(add(x, position), -dr), add(center, dragging)),
       rotation: normalizeAngle(rotation + dr)
     });
   };
