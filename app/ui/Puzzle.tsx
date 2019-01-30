@@ -73,10 +73,13 @@ export class Puzzle extends Component<IPuzzleProps> {
       const angle = normalizeAngle(_.rotation - rotation);
       return Math.min(angle, 360 - angle);
     };
+
     const distance = (_: IPiece) => length(subtract(_.position, position));
+
     const adjacentShape = (a: Shape, b: Shape) =>
       length(subtract(centroid(a), centroid(b))) <=
       boundingRadius(a) + boundingRadius(b);
+
     const adjacent = (_: IPiece) =>
       piece.shapes
         .map(a => _.shapes.map(b => [a, b]))
