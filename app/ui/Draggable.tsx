@@ -40,7 +40,9 @@ export class Draggable extends Component<IDraggableProps> {
     return (
       <g
         ref={_ => (this.gRef = _ || undefined)}
-        transform={`rotate(${rotation}) translate(${x} ${y})`}
+        transform={`rotate(${rotation.toFixed(2)}) translate(${x.toFixed(
+          4
+        )} ${y.toFixed(4)})`}
         onMouseDown={this.onMouseDown}
       >
         {children}
