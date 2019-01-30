@@ -2,6 +2,7 @@ import { observable } from "mobx";
 import { observer } from "mobx-react";
 import * as React from "react";
 import { Component } from "react";
+import { style } from "typestyle";
 import {
   boundingRadius,
   centroid,
@@ -17,6 +18,10 @@ export interface IPuzzleProps {
   puzzle: IPuzzle;
 }
 
+const className = style({
+  background: `#101010`
+});
+
 @observer
 export class Puzzle extends Component<IPuzzleProps> {
   @observable
@@ -27,14 +32,7 @@ export class Puzzle extends Component<IPuzzleProps> {
     const { imageUrl, pieces } = puzzle;
 
     return (
-      <svg
-        viewBox={`0 0 1 1`}
-        width="100%"
-        height="100%"
-        style={{
-          background: `#101010`
-        }}
-      >
+      <svg viewBox={`0 0 1 1`} width="100%" height="100%" className={className}>
         <Zoomable>
           {pieces.map(piece => (
             <Piece

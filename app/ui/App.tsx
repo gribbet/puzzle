@@ -10,6 +10,11 @@ import { Puzzle } from "./Puzzle";
 // TODO: Perlin offset
 // TODO: Firefox dragging
 
+const className = style({
+  display: "flex",
+  flex: 1
+});
+
 @observer
 export class App extends Component {
   @observable
@@ -22,14 +27,7 @@ export class App extends Component {
   public render() {
     const { puzzle } = this;
     return (
-      <div
-        className={style({
-          display: "flex",
-          flex: 1
-        })}
-      >
-        {puzzle && <Puzzle puzzle={puzzle} />}
-      </div>
+      <div className={className}>{puzzle && <Puzzle puzzle={puzzle} />}</div>
     );
   }
 }

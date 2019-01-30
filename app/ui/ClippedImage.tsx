@@ -1,6 +1,7 @@
 import * as React from "react";
 import { PureComponent } from "react";
 import { Shape } from "../model";
+import { format } from "../util";
 
 export interface IClippedImageProps {
   imageUrl: string;
@@ -19,9 +20,9 @@ export class ClippedImage extends PureComponent<IClippedImageProps> {
       shape
         .map(
           ([x, y], i) =>
-            `${(i === 0 && "M") || (i % 3 == 1 && "C") || " "}${x.toFixed(
-              4
-            )} ${y.toFixed(4)}`
+            `${(i === 0 && "M") || (i % 3 == 1 && "C") || " "}${format(
+              x
+            )} ${format(y)}`
         )
         .reduce((a, b) => a + b) + "Z";
 

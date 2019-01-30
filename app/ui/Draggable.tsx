@@ -12,6 +12,7 @@ import {
 } from "../math";
 import { Point } from "../model";
 import { screenToLocal } from "../svg";
+import { format } from "../util";
 
 export interface IDraggableProps {
   position: Point;
@@ -40,9 +41,9 @@ export class Draggable extends Component<IDraggableProps> {
     return (
       <g
         ref={_ => (this.gRef = _ || undefined)}
-        transform={`rotate(${rotation.toFixed(2)}) translate(${x.toFixed(
-          4
-        )} ${y.toFixed(4)})`}
+        transform={`rotate(${format(rotation)}) translate(${format(x)} ${format(
+          y
+        )})`}
         onMouseDown={this.onMouseDown}
       >
         {children}
