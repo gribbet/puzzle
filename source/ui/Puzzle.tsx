@@ -12,10 +12,13 @@ import {
 import { IPiece, IPuzzle, Point, Shape } from "../model";
 import { Piece } from "./Piece";
 import { Zoomable } from "./Zoomable";
+import { style } from "typestyle";
 
 export interface IPuzzleProps {
   puzzle: IPuzzle;
 }
+
+const className = style({background: "#101010"});
 
 @observer
 export class Puzzle extends Component<IPuzzleProps> {
@@ -31,9 +34,7 @@ export class Puzzle extends Component<IPuzzleProps> {
         viewBox={`0 0 1 1`}
         width="100%"
         height="100%"
-        style={{
-          background: `#101010`
-        }}
+        className={className}
       >
         <Zoomable>
           {pieces.map(piece => (
