@@ -10,26 +10,29 @@ import { Puzzle } from "./Puzzle";
 // TODO: Perlin offset
 // TODO: Firefox dragging
 
+const className = style({
+    display: "flex",
+    flex: 1, 
+    background: "#101010"
+})
+
 @observer
 export class App extends Component {
-  @observable
-  private puzzle?: IPuzzle;
+    @observable
+    private puzzle?: IPuzzle;
 
-  public async componentWillMount() {
-    this.puzzle = await generate("https://i.redd.it/zzz4o8zgf9d21.jpg", 20);
-  }
+    public async componentWillMount() {
+        this.puzzle = await generate("https://i.imgur.com/VrA2kh1.jpg", 20);
+    }
 
-  public render() {
-    const { puzzle } = this;
-    return (
-      <div
-        className={style({
-          display: "flex",
-          flex: 1
-        })}
-      >
-        {puzzle && <Puzzle puzzle={puzzle} />}
-      </div>
-    );
-  }
+    public render() {
+        const { puzzle } = this;
+        return (
+            <div
+                className={className}
+            >
+                {puzzle && <Puzzle puzzle={puzzle} />}
+            </div>
+        );
+    }
 }

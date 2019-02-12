@@ -18,8 +18,6 @@ export interface IPuzzleProps {
   puzzle: IPuzzle;
 }
 
-const className = style({background: "#101010"});
-
 @observer
 export class Puzzle extends Component<IPuzzleProps> {
   @observable
@@ -34,7 +32,6 @@ export class Puzzle extends Component<IPuzzleProps> {
         viewBox={`0 0 1 1`}
         width="100%"
         height="100%"
-        className={className}
       >
         <Zoomable>
           {pieces.map(piece => (
