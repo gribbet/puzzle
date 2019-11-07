@@ -2,22 +2,22 @@
   "name": "puzzle",
   "version": "1.0.0",
   "devDependencies": {
-    "@types/react": "^16.7.18",
-    "@types/react-dom": "^16.0.11",
-    "parcel": "^1.11.0",
-    "typescript": "^3.2.2"
+    "@types/react": "*",
+    "@types/react-dom": "*",
+    "parcel": "*",
+    "typescript": "*"
   },
   "dependencies": {
-    "mobx": "^5.8.0",
-    "mobx-react": "^5.4.3",
-    "react": "^16.7.0",
-    "react-dom": "^16.7.0",
-    "typestyle": "^2.0.1"
+    "mobx": "*",
+    "mobx-react": "*",
+    "react": "*",
+    "react-dom": "*",
+    "typestyle": "*"
   },
   "scripts": {
     "start": "parcel app/index.html"
   },
   "browserslist": [
-    "since 2017-06"
+    "last 2 Chrome versions"
   ]
 }
