@@ -51,7 +51,9 @@ export class Draggable extends Component<IDraggableProps> {
     );
   }
 
-  private onMouseDown = ({ clientX, clientY }: React.MouseEvent) => {
+  private onMouseDown = (event: React.MouseEvent) => {
+    event.preventDefault();
+    const { clientX, clientY } = event;
     this.dragging = screenToLocal(this.gRef!, [clientX, clientY]);
   };
 

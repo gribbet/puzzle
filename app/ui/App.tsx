@@ -8,7 +8,6 @@ import { IPuzzle } from "../model";
 import { Puzzle } from "./Puzzle";
 
 // TODO: Perlin offset
-// TODO: Firefox dragging
 
 const className = style({
   display: "flex",
@@ -21,7 +20,7 @@ export class App extends Component {
   private puzzle?: IPuzzle;
 
   public async componentDidMount() {
-    this.puzzle = await generate("https://i.redd.it/zzz4o8zgf9d21.jpg", 20);
+    this.puzzle = await generate("https://i.imgur.com/VrA2kh1.jpg", 100);
   }
 
   public render() {
