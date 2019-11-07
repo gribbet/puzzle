@@ -2,7 +2,7 @@ import { observable } from "mobx";
 import { observer } from "mobx-react";
 import * as React from "react";
 import { Component } from "react";
-import { add, subtract, scale } from "../math";
+import { add, scale, subtract } from "../math";
 import { Point } from "../model";
 import { screenToLocal } from "../svg";
 
@@ -14,7 +14,7 @@ export class Zoomable extends Component {
   private scale: number = 1;
   private gRef?: SVGGElement;
 
-  public componentWillMount() {
+  public componentDidMount() {
     window.addEventListener("wheel", this.onWheel);
   }
 
@@ -39,14 +39,16 @@ export class Zoomable extends Component {
   }
 
   private onWheel = (event: WheelEvent) => {
-    event.preventDefault();
     event.stopPropagation();
 
     if (event.ctrlKey) {
       const ds = this.scale * event.deltaY * 0.01;
       const a = screenToLocal(this.gRef!, [event.clientX, event.clientY]);
 
-      this.center = add(scale(subtract(this.center, a), (this.scale + ds)/this.scale), a);
+      this.center = add(
+        scale(subtract(this.center, a), (this.scale + ds) / this.scale),
+        a
+      );
       this.scale -= ds;
     } else {
       const a = screenToLocal(this.gRef!, [event.clientX, event.clientY]);

@@ -26,7 +26,7 @@ export class Draggable extends Component<IDraggableProps> {
   private gRef?: SVGGElement;
   private dragging?: Point;
 
-  public componentWillMount() {
+  public componentDidMount() {
     window.addEventListener("mousemove", this.onMouseMove);
   }
 

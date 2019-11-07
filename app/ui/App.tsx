@@ -20,7 +20,7 @@ export class App extends Component {
   @observable
   private puzzle?: IPuzzle;
 
-  public async componentWillMount() {
+  public async componentDidMount() {
     this.puzzle = await generate("https://i.redd.it/zzz4o8zgf9d21.jpg", 20);
   }
 
