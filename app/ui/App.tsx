@@ -16,7 +16,7 @@ const className = style({
 
 @observer
 export class App extends Component {
-  @observable
+  @observable.shallow
   private puzzle?: IPuzzle;
 
   public async componentDidMount() {

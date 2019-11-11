@@ -14,17 +14,17 @@ import { IPiece, IPuzzle, Point, Shape } from "../model";
 import { Piece } from "./Piece";
 import { Zoomable } from "./Zoomable";
 
-export interface IPuzzleProps {
-  puzzle: IPuzzle;
-}
-
 const className = style({
   background: `#101010`
 });
 
+export interface IPuzzleProps {
+  puzzle: IPuzzle;
+}
+
 @observer
 export class Puzzle extends Component<IPuzzleProps> {
-  @observable
+  @observable.shallow
   private puzzle: IPuzzle = this.props.puzzle;
 
   public render() {
@@ -36,7 +36,7 @@ export class Puzzle extends Component<IPuzzleProps> {
         <Zoomable>
           {pieces.map(piece => (
             <Piece
-              key={piece.number}
+              key={`${piece.number}-${piece.shapes.length}`}
               piece={piece}
               imageUrl={imageUrl}
               onMove={this.onMovePiece}
@@ -56,7 +56,7 @@ export class Puzzle extends Component<IPuzzleProps> {
     position: Point;
     rotation: number;
   }) => {
-    const { puzzle } = this.props;
+    const { puzzle } = this;
     const { pieces } = puzzle;
 
     const piece = pieces.find(_ => _.number === number);
@@ -93,14 +93,17 @@ export class Puzzle extends Component<IPuzzleProps> {
         adjacent(_)
     );
 
-    puzzle.pieces = [
-      ...others.filter(_ => _ !== match),
-      {
-        ...piece,
-        position,
-        rotation,
-        shapes: [...piece.shapes, ...(match ? match.shapes : [])]
-      }
-    ];
+    this.puzzle = {
+      ...puzzle,
+      pieces: [
+        ...others.filter(_ => _ !== match),
+        {
+          ...piece,
+          position,
+          rotation,
+          shapes: [...piece.shapes, ...(match ? match.shapes : [])]
+        }
+      ]
+    };
   };
 }

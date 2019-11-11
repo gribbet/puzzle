@@ -20,19 +20,12 @@ export interface IDraggableProps {
   center: Point;
   radius: number;
   onMove: (_: { position: Point; rotation: number }) => void;
+  onMoveEnd: () => void;
 }
 
 export class Draggable extends Component<IDraggableProps> {
   private gRef?: SVGGElement;
   private dragging?: Point;
-
-  public componentDidMount() {
-    window.addEventListener("mousemove", this.onMouseMove);
-  }
-
-  public componentWillUnmount() {
-    window.removeEventListener("mousemove", this.onMouseMove);
-  }
 
   public render() {
     const { position, rotation, children } = this.props;
@@ -55,11 +48,14 @@ export class Draggable extends Component<IDraggableProps> {
     event.preventDefault();
     const { clientX, clientY } = event;
     this.dragging = screenToLocal(this.gRef!, [clientX, clientY]);
+    window.addEventListener("mousemove", this.onMouseMove);
   };
 
   private onMouseMove = (event: MouseEvent) => {
     if (!event.buttons) {
+      window.removeEventListener("mousemove", this.onMouseMove);
       this.dragging = undefined;
+      this.props.onMoveEnd();
     }
 
     if (this.dragging === undefined || !this.gRef) {
