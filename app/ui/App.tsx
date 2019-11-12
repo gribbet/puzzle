@@ -19,7 +19,7 @@ export function App() {
 
   useAsyncEffect(
     async () =>
-      setPuzzle(await generate("https://i.imgur.com/VrA2kh1.jpg", 10)),
+      setPuzzle(await generate("https://i.imgur.com/VrA2kh1.jpg", 100)),
     []
   );
 

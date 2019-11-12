@@ -16,6 +16,9 @@ export async function generate(
 
   const pieceHeight = 1 / (tall ? 1 : aspect) / rows;
   const pieceWidth = (1 * (tall ? aspect : 1)) / columns;
+
+  const size = Math.sqrt(pieceWidth * pieceWidth + pieceHeight * pieceHeight);
+
   const offsetX = tall ? (1 - aspect) / 2 : 0;
   const offsetY = tall ? 0 : (1 - 1 / aspect) / 2;
 
@@ -60,8 +63,8 @@ export async function generate(
           position: add(
             rotate(
               [
-                Math.random() * (1 - pieceWidth) + pieceWidth / 2,
-                Math.random() * (1 - pieceHeight) + pieceHeight / 2
+                Math.random() * (1 - size) + size / 2,
+                Math.random() * (1 - size) + size / 2
               ],
               -rotation
             ),
