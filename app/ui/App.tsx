@@ -6,6 +6,7 @@ import { IPuzzle } from "../model";
 import { Puzzle } from "./Puzzle";
 import { useAsyncEffect } from "./useAsyncEffect";
 
+// TODO: Correct calculation of transforms?
 // TODO: Perlin offset
 
 const className = style({
@@ -18,7 +19,7 @@ export function App() {
 
   useAsyncEffect(
     async () =>
-      setPuzzle(await generate("https://i.imgur.com/VrA2kh1.jpg", 100)),
+      setPuzzle(await generate("https://i.imgur.com/VrA2kh1.jpg", 10)),
     []
   );
 
