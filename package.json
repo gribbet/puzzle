@@ -8,8 +8,6 @@
     "typescript": "*"
   },
   "dependencies": {
-    "mobx": "*",
-    "mobx-react": "*",
     "react": "*",
     "react-dom": "*",
     "typestyle": "*"

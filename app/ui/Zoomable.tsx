@@ -1,63 +1,53 @@
-import { observable } from "mobx";
-import { observer } from "mobx-react";
 import * as React from "react";
-import { Component } from "react";
+import { ReactNode, useRef, useState } from "react";
 import { add, scale, subtract } from "../math";
 import { Point } from "../model";
 import { screenToLocal } from "../svg";
+import { useWindowEvent } from "./useWindowEvent";
 
-@observer
-export class Zoomable extends Component {
-  @observable
-  private center: Point = [0, 0];
-  @observable
-  private scale: number = 1;
-  private gRef?: SVGGElement;
+export function Zoomable(props: { children?: ReactNode }) {
+  const [center, setCenter] = useState<Point>([0, 0]);
+  const [zoom, setZoom] = useState(1);
 
-  public componentDidMount() {
-    window.addEventListener("wheel", this.onWheel);
-  }
+  const element = useRef<SVGGElement>(null);
 
-  public componentWillUnmount() {
-    window.removeEventListener("wheel", this.onWheel);
-  }
+  useWindowEvent(
+    "wheel",
+    (event: WheelEvent) => {
+      if (!element.current) {
+        return;
+      }
 
-  public render() {
-    const { children } = this.props;
-    const { center, scale } = this;
+      event.stopPropagation();
 
-    const [x, y] = center;
+      const { ctrlKey, clientX, clientY, deltaX, deltaY } = event;
 
-    return (
-      <g
-        ref={_ => (this.gRef = _ || undefined)}
-        transform={`scale(${scale}) translate(${-x} ${-y})`}
-      >
-        {children}
-      </g>
-    );
-  }
+      const client: Point = [clientX, clientY];
+      const a = screenToLocal(element.current, client);
 
-  private onWheel = (event: WheelEvent) => {
-    event.stopPropagation();
+      if (ctrlKey) {
+        const dz = zoom * deltaY * 0.01;
 
-    if (event.ctrlKey) {
-      const ds = this.scale * event.deltaY * 0.01;
-      const a = screenToLocal(this.gRef!, [event.clientX, event.clientY]);
+        setCenter(add(scale(subtract(center, a), (zoom + dz) / zoom), a));
+        setZoom(zoom - dz);
+      } else {
+        const b = screenToLocal(element.current, [
+          clientX + deltaX,
+          clientY + deltaY
+        ]);
 
-      this.center = add(
-        scale(subtract(this.center, a), (this.scale + ds) / this.scale),
-        a
-      );
-      this.scale -= ds;
-    } else {
-      const a = screenToLocal(this.gRef!, [event.clientX, event.clientY]);
-      const b = screenToLocal(this.gRef!, [
-        event.clientX + event.deltaX,
-        event.clientY + event.deltaY
-      ]);
+        setCenter(add(center, subtract(b, a)));
+      }
+    },
+    [center, scale]
+  );
 
-      this.center = add(this.center, subtract(b, a));
-    }
-  };
+  const { children } = props;
+  const [x, y] = center;
+
+  return (
+    <g ref={element} transform={`scale(${zoom}) translate(${-x} ${-y})`}>
+      {children}
+    </g>
+  );
 }

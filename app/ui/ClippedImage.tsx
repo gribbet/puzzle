@@ -1,5 +1,5 @@
 import * as React from "react";
-import { PureComponent } from "react";
+import { useMemo } from "react";
 import { Shape } from "../model";
 import { format } from "../util";
 
@@ -10,13 +10,13 @@ export interface IClippedImageProps {
 
 let count = 0;
 
-export class ClippedImage extends PureComponent<IClippedImageProps> {
-  private index: number = count++;
+export function ClippedImage(props: IClippedImageProps) {
+  const index: number = count++;
 
-  public render() {
-    const { imageUrl, shape } = this.props;
+  const { imageUrl, shape } = props;
 
-    const path =
+  const path = useMemo(
+    () =>
       shape
         .map(
           ([x, y], i) =>
@@ -24,23 +24,24 @@ export class ClippedImage extends PureComponent<IClippedImageProps> {
               x
             )} ${format(y)}`
         )
-        .reduce((a, b) => a + b) + "Z";
+        .reduce((a, b) => a + b) + "Z",
+    [shape]
+  );
 
-    return (
-      <g>
-        <clipPath id={`clip-${this.index}`}>
-          <path d={path} />
-        </clipPath>
-        <image
-          xlinkHref={imageUrl}
-          x={0}
-          y={0}
-          width={1}
-          height={1}
-          clipPath={`url(#clip-${this.index})`}
-          cursor="pointer"
-        />
-      </g>
-    );
-  }
+  return (
+    <g>
+      <clipPath id={`clip-${index}`}>
+        <path d={path} />
+      </clipPath>
+      <image
+        xlinkHref={imageUrl}
+        x={0}
+        y={0}
+        width={1}
+        height={1}
+        clipPath={`url(#clip-${index})`}
+        cursor="pointer"
+      />
+    </g>
+  );
 }

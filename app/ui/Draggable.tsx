@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Component } from "react";
+import { ReactNode, useCallback, useRef, useState } from "react";
 import {
   add,
   dot,
@@ -13,6 +13,7 @@ import {
 import { Point } from "../model";
 import { screenToLocal } from "../svg";
 import { format } from "../util";
+import { useWindowEvent } from "./useWindowEvent";
 
 export interface IDraggableProps {
   position: Point;
@@ -21,64 +22,82 @@ export interface IDraggableProps {
   radius: number;
   onMove: (_: { position: Point; rotation: number }) => void;
   onMoveEnd: () => void;
+  children?: ReactNode;
 }
 
-export class Draggable extends Component<IDraggableProps> {
-  private gRef?: SVGGElement;
-  private dragging?: Point;
+export function Draggable(props: IDraggableProps) {
+  const element = useRef<SVGGElement>(null);
+  const [dragging, setDragging] = useState<Point | undefined>();
 
-  public render() {
-    const { position, rotation, children } = this.props;
-    const [x, y] = position;
+  const {
+    position,
+    rotation,
+    center,
+    radius,
+    onMove,
+    onMoveEnd,
+    children
+  } = props;
 
-    return (
-      <g
-        ref={_ => (this.gRef = _ || undefined)}
-        transform={`rotate(${format(rotation)}) translate(${format(x)} ${format(
-          y
-        )})`}
-        onMouseDown={this.onMouseDown}
-      >
-        {children}
-      </g>
-    );
-  }
+  useWindowEvent(
+    "mousemove",
+    (event: MouseEvent) => {
+      if (!dragging || !element.current) {
+        return;
+      }
 
-  private onMouseDown = (event: React.MouseEvent) => {
-    event.preventDefault();
-    const { clientX, clientY } = event;
-    this.dragging = screenToLocal(this.gRef!, [clientX, clientY]);
-    window.addEventListener("mousemove", this.onMouseMove);
-  };
+      const { clientX, clientY, movementX, movementY, buttons } = event;
 
-  private onMouseMove = (event: MouseEvent) => {
-    if (!event.buttons) {
-      window.removeEventListener("mousemove", this.onMouseMove);
-      this.dragging = undefined;
-      this.props.onMoveEnd();
-    }
+      if (!buttons) {
+        setDragging(undefined);
+        onMoveEnd();
+        return;
+      }
 
-    if (this.dragging === undefined || !this.gRef) {
+      if (!movementX && !movementY) {
+        return;
+      }
+
+      const client: Point = [clientX, clientY];
+      const movement: Point = [movementX, movementY];
+      const offset = subtract(dragging, center);
+
+      const x0 = screenToLocal(element.current, subtract(client, movement));
+      const x = screenToLocal(element.current, client);
+      const dr =
+        toDegrees(
+          dot(subtract(x, x0), perpendicular(offset)) / radius / radius / radius
+        ) * length(offset);
+
+      onMove({
+        position: subtract(rotate(add(x, position), -dr), add(center, offset)),
+        rotation: normalizeAngle(rotation + dr)
+      });
+    },
+    [position, rotation, center, radius, onMove, onMoveEnd]
+  );
+
+  const onMouseDown = useCallback((event: React.MouseEvent) => {
+    if (!element.current) {
       return;
     }
-
-    const { position, rotation, center, radius, onMove } = this.props;
-    const { clientX, clientY, movementX, movementY } = event;
-
+    event.preventDefault();
+    const { clientX, clientY } = event;
     const client: Point = [clientX, clientY];
-    const movement: Point = [movementX, movementY];
-    const dragging = subtract(this.dragging, center);
+    setDragging(screenToLocal(element.current, client));
+  }, []);
 
-    const x0 = screenToLocal(this.gRef, subtract(client, movement));
-    const x = screenToLocal(this.gRef, client);
-    const dr =
-      toDegrees(
-        dot(subtract(x, x0), perpendicular(dragging)) / radius / radius / radius
-      ) * length(dragging);
+  const [x, y] = position;
 
-    onMove({
-      position: subtract(rotate(add(x, position), -dr), add(center, dragging)),
-      rotation: normalizeAngle(rotation + dr)
-    });
-  };
+  return (
+    <g
+      ref={element}
+      transform={`rotate(${format(rotation)}) translate(${format(x)} ${format(
+        y
+      )})`}
+      onMouseDown={onMouseDown}
+    >
+      {children}
+    </g>
+  );
 }

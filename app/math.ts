@@ -24,7 +24,7 @@ export function centroid(shape: Shape): Point {
     .reduce(([x1, y1], [x2, y2]) => [x1 + x2, y1 + y2]);
 }
 
-export function radius(shape: Shape): number {
+export function meanSquaredRadius(shape: Shape): number {
   const c = centroid(shape);
   return Math.sqrt(
     shape
